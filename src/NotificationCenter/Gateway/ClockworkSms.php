@@ -11,6 +11,7 @@
 namespace NotificationCenter\Gateway;
 
 use NotificationCenter\MessageDraft\ClockworkSmsMessageDraft;
+use NotificationCenter\MessageDraft\MessageDraftCheckSendInterface;
 use NotificationCenter\MessageDraft\MessageDraftFactoryInterface;
 use NotificationCenter\MessageDraft\MessageDraftInterface;
 use NotificationCenter\MessageDraft\PostmarkMessageDraft;
@@ -23,7 +24,7 @@ use NotificationCenter\Model\Message;
  * Class ClockworkSms
  * @package NotificationCenter\Gateway
  */
-class ClockworkSms extends Base implements GatewayInterface, MessageDraftFactoryInterface
+class ClockworkSms extends Base implements GatewayInterface, MessageDraftFactoryInterface, MessageDraftCheckSendInterface
 {
 
 	/**
@@ -137,5 +138,33 @@ class ClockworkSms extends Base implements GatewayInterface, MessageDraftFactory
 		}
 
 		return !$blnError;
+	}
+
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function canSendDraft(Message $objMessage)
+	{
+		// Create a dummy draft
+		// All drafts get the member data as tokens with "member_" prefix. We imitate it here
+		/** @var \MemberModel|\Model $objMember */
+		$objMember = \MemberModel::findByPk(\FrontendUser::getInstance()->id);
+		$objDraft = $this->createDraft($objMessage, array_combine
+		(
+			array_map(function ($key)
+			{
+				return 'member_' . $key;
+			}, array_keys($objMember->row())),
+			$objMember->row()
+		));
+
+		/** @noinspection PhpUndefinedMethodInspection */
+		if (empty($objDraft->getRecipients()))
+		{
+			throw new \LogicException($GLOBALS['TL_LANG']['ERR']['clockworkDraftCanNotSend']);
+		}
+
+		return true;
 	}
 }

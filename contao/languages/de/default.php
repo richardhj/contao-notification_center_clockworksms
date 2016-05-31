@@ -12,4 +12,5 @@
 /**
  * Errors
  */
+$GLOBALS['TL_LANG']['ERR']['clockworkDraftCanNotSend'] = 'Dem Benutzerprofil fehlt eine gültige Handynummer, um diese Nachricht verwenden zu können.';
 $GLOBALS['TL_LANG']['ERR']['invalidClockworkSmsSender'] = 'Der Absender darf maximal aus 11 Zeichen oder einer maximal 12 Zeichen langen Telefonnummer bestehen. Telefonnummern geben Sie bitte mit Länder-Präfix ohne "+" oder "00" an und ohne jegliche Trennzeichen.';

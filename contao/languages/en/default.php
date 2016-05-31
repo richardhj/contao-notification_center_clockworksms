@@ -12,4 +12,5 @@
 /**
  * Errors
  */
+$GLOBALS['TL_LANG']['ERR']['clockworkDraftCanNotSend'] = 'This notification requires a valid mobile phone number.';
 $GLOBALS['TL_LANG']['ERR']['invalidClockworkSmsSender'] = 'The sender has to be a maximum of 11 characters or 12 digits. Phone numbers start with a international dialling prefix without "+" oder "00" and without spaces or hyphens.';
