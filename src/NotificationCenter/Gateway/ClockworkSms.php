@@ -149,6 +149,7 @@ class ClockworkSms extends Base implements GatewayInterface, MessageDraftFactory
 		// All drafts get the member data as tokens with "member_" prefix. We imitate it here
 		/** @var \MemberModel|\Model $objMember */
 		$objMember = \MemberModel::findByPk(\FrontendUser::getInstance()->id);
+		/** @var ClockworkSmsMessageDraft $objDraft */
 		$objDraft = $this->createDraft($objMessage, array_combine
 		(
 			array_map(function ($key)
@@ -158,7 +159,6 @@ class ClockworkSms extends Base implements GatewayInterface, MessageDraftFactory
 			$objMember->row()
 		));
 
-		/** @noinspection PhpUndefinedMethodInspection */
 		if (empty($objDraft->getRecipients()))
 		{
 			throw new \LogicException($GLOBALS['TL_LANG']['ERR']['clockworkDraftCanNotSend']);
