@@ -13,10 +13,10 @@ namespace NotificationCenter\Util;
 
 
 /**
- * Class Helper
+ * Class ClockworkSmsHelper
  * @package NotificationCenter\Util
  */
-class Helper
+class ClockworkSmsHelper
 {
 
 	/**
@@ -59,8 +59,7 @@ class Helper
 	 * @return mixed
 	 * @throws \Exception
 	 */
-	public
-	function validatePhoneNumberList($varValue, \DataContainer $dc)
+	public function validatePhoneNumberList($varValue, \DataContainer $dc)
 	{
 		if ($varValue != '')
 		{

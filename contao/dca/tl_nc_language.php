@@ -27,7 +27,7 @@ $GLOBALS['TL_DCA']['tl_nc_language']['fields']['sms_sender'] = array
 	'sql'       => "varchar(255) NOT NULL default ''",
 	'save_callback' => array
 	(
-		array('NotificationCenter\Util\Helper', 'validateSmsSender')
+		array('NotificationCenter\Util\ClockworkSmsHelper', 'validateSmsSender')
 	)
 );
 
@@ -40,7 +40,7 @@ $GLOBALS['TL_DCA']['tl_nc_language']['fields']['sms_recipients'] = array
 	'sql'           => "varchar(255) NOT NULL default ''",
 	'save_callback' => array
 	(
-		array('NotificationCenter\Util\Helper', 'validatePhoneNumberList')
+		array('NotificationCenter\Util\ClockworkSmsHelper', 'validatePhoneNumberList')
 	)
 );
 
