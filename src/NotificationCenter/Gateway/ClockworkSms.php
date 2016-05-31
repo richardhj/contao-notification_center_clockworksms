@@ -10,7 +10,6 @@
 
 namespace NotificationCenter\Gateway;
 
-use NotificationCenter\Gateway\MessageDraftCheckSendInterface;
 use NotificationCenter\MessageDraft\ClockworkSmsMessageDraft;
 use NotificationCenter\MessageDraft\MessageDraftFactoryInterface;
 use NotificationCenter\MessageDraft\MessageDraftInterface;
