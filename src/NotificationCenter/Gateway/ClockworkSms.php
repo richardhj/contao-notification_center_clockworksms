@@ -159,7 +159,9 @@ class ClockworkSms extends Base implements GatewayInterface, MessageDraftFactory
 			$objMember->row()
 		));
 
-		if (empty($objDraft->getRecipients()))
+		$arrRecipients = $objDraft->getRecipients();
+		
+		if (empty($arrRecipients))
 		{
 			throw new \LogicException($GLOBALS['TL_LANG']['ERR']['clockworkDraftCanNotSend']);
 		}
