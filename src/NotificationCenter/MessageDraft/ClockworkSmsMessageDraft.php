@@ -15,7 +15,7 @@ use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use NotificationCenter\Model\Language;
 use NotificationCenter\Model\Message;
-use NotificationCenter\Util\String;
+use NotificationCenter\Util\StringUtil;
 
 
 /**
@@ -65,7 +65,11 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
 	 */
 	public function getFrom()
 	{
-		return String::recursiveReplaceTokensAndTags($this->objLanguage->sms_sender, $this->arrTokens, String::NO_TAGS | String::NO_EMAILS | String::NO_BREAKS) ?: null;
+        return StringUtil::recursiveReplaceTokensAndTags(
+            $this->objLanguage->sms_sender,
+            $this->arrTokens,
+            StringUtil::NO_TAGS | StringUtil::NO_EMAILS | StringUtil::NO_BREAKS
+        ) ?: null;
 	}
 
 
@@ -75,14 +79,22 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
 	public function getRecipients()
 	{
 		// Replaces tokens first so that tokens can contain a list of recipients.
-		$strRecipients = String::recursiveReplaceTokensAndTags($this->objLanguage->sms_recipients, $this->arrTokens, String::NO_TAGS | String::NO_EMAILS | String::NO_BREAKS);
+        $strRecipients = StringUtil::recursiveReplaceTokensAndTags(
+            $this->objLanguage->sms_recipients,
+            $this->arrTokens,
+            StringUtil::NO_TAGS | StringUtil::NO_EMAILS | StringUtil::NO_BREAKS
+        );
 		$arrRecipients = array();
 
 		foreach ((array)trimsplit(',', $strRecipients) as $strRecipient)
 		{
 			if ($strRecipient != '')
 			{
-				$strRecipient = String::recursiveReplaceTokensAndTags($strRecipient, $this->arrTokens, String::NO_TAGS | String::NO_EMAILS | String::NO_BREAKS);
+                $strRecipient = StringUtil::recursiveReplaceTokensAndTags(
+                    $strRecipient,
+                    $this->arrTokens,
+                    StringUtil::NO_TAGS | StringUtil::NO_EMAILS | StringUtil::NO_BREAKS
+                );
 				$strRecipient = $this->normalizePhoneNumber($strRecipient);
 
 				// Address could become empty through invalid insert tag
@@ -118,7 +130,11 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
 		{
 			// We have to find a default country code as we can not make sure to get a internationalized phone number
 			$strDefaultRegion =
-				(String::recursiveReplaceTokensAndTags($this->objLanguage->sms_recipients_region, $this->arrTokens, String::NO_TAGS | String::NO_EMAILS | String::NO_BREAKS))
+                (StringUtil::recursiveReplaceTokensAndTags(
+                    $this->objLanguage->sms_recipients_region,
+                    $this->arrTokens,
+                    StringUtil::NO_TAGS | StringUtil::NO_EMAILS | StringUtil::NO_BREAKS
+                ))
 				?: $this->objLanguage->language;
 
 			$phoneNumber = $objPhoneNumberUtil->parse($strPhone, strtoupper($strDefaultRegion));
@@ -144,7 +160,7 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
 	public function getText()
 	{
 		$strText = $this->objLanguage->sms_text;
-		$strText = String::recursiveReplaceTokensAndTags($strText, $this->arrTokens, String::NO_TAGS);
+        $strText = StringUtil::recursiveReplaceTokensAndTags($strText, $this->arrTokens, StringUtil::NO_TAGS);
 
 		return \Controller::convertRelativeUrls($strText, '', true);
 	}
