@@ -2,7 +2,7 @@
 /**
  * Clockwork SMS gateway for the notification_center extension for Contao Open Source CMS
  *
- * Copyright (c) 2016 Richard Henkenjohann
+ * Copyright (c) 2016-2017 Richard Henkenjohann
  *
  * @package NotificationCenterClockworkSMS
  * @author  Richard Henkenjohann <richardhenkenjohann@googlemail.com>
@@ -19,68 +19,60 @@ namespace NotificationCenter\Util;
 class ClockworkSmsHelper
 {
 
-	/**
-	 * Validate e-mail addresses in the comma separated list
-	 *
-	 * @param mixed
-	 * @param \DataContainer
-	 *
-	 * @return mixed
-	 * @throws \Exception
-	 */
-	public function validateSmsSender($varValue, \DataContainer $dc)
-	{
-		if ($varValue != '')
-		{
-			if (strpos($varValue, '##') !== false || strpos($varValue, '{{') !== false)
-			{
-				return $varValue;
-			}
+    /**
+     * Validate e-mail addresses in the comma separated list
+     *
+     * @param mixed $varValue
+     *
+     * @return mixed
+     * @throws \Exception
+     * @internal param \DataContainer $dc
+     */
+    public function validateSmsSender($varValue)
+    {
+        if ('' !== $varValue) {
+            if (false !== strpos($varValue, '##') || false !== strpos($varValue, '{{')) {
+                return $varValue;
+            }
 
-			if ((!\Validator::isAlphanumeric($varValue) && !\Clockwork::is_valid_msisdn($varValue))
-				|| (\Validator::isAlphanumeric($varValue) && strlen($varValue) > 11)
-			)
-			{
-				throw new \Exception($GLOBALS['TL_LANG']['ERR']['invalidClockworkSmsSender']);
-			}
+            if ((!\Validator::isAlphanumeric($varValue) && !\Clockwork::is_valid_msisdn($varValue))
+                || (\Validator::isAlphanumeric($varValue) && strlen($varValue) > 11)
+            ) {
+                throw new \Exception($GLOBALS['TL_LANG']['ERR']['invalidClockworkSmsSender']);
+            }
 
-		}
+        }
 
-		return $varValue;
-	}
+        return $varValue;
+    }
 
 
-	/**
-	 * Validate e-mail addresses in the comma separated list
-	 *
-	 * @param mixed
-	 * @param \DataContainer
-	 *
-	 * @return mixed
-	 * @throws \Exception
-	 */
-	public function validatePhoneNumberList($varValue, \DataContainer $dc)
-	{
-		if ($varValue != '')
-		{
-			$chunks = trimsplit(',', $varValue);
+    /**
+     * Validate e-mail addresses in the comma separated list
+     *
+     * @param mixed $varValue
+     *
+     * @return mixed
+     * @throws \Exception
+     * @internal param \DataContainer $dc
+     */
+    public function validatePhoneNumberList($varValue)
+    {
+        if ('' !== $varValue) {
+            $chunks = trimsplit(',', $varValue);
 
-			foreach ($chunks as $chunk)
-			{
+            foreach ($chunks as $chunk) {
+                // Skip string with tokens or inserttags
+                if (false !== strpos($chunk, '##') || false !== strpos($chunk, '{{')) {
+                    continue;
+                }
 
-				// Skip string with tokens or inserttags
-				if (strpos($chunk, '##') !== false || strpos($chunk, '{{') !== false)
-				{
-					continue;
-				}
+                if (!\Validator::isPhone($chunk)) {
+                    throw new \Exception($GLOBALS['TL_LANG']['ERR']['phone']);
+                }
+            }
+        }
 
-				if (!\Validator::isPhone($chunk))
-				{
-					throw new \Exception($GLOBALS['TL_LANG']['ERR']['phone']);
-				}
-			}
-		}
-
-		return $varValue;
-	}
+        return $varValue;
+    }
 }

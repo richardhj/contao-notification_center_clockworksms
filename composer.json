@@ -16,7 +16,7 @@
 		"source": "https://github.com/richardhj/contao-notification_center_clockworksms"
 	},
 	"require": {
-		"php": ">=5.3",
+		"php": "^5.4 || ^7.0",
 		"contao/core": "^3.1",
 		"terminal42/notification_center": "^1.3.5",
 		"richardhj/contao-notification_center_checksendinterface": "^1.0",

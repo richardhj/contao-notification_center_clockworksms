@@ -2,7 +2,7 @@
 /**
  * Clockwork SMS gateway for the notification_center extension for Contao Open Source CMS
  *
- * Copyright (c) 2016 Richard Henkenjohann
+ * Copyright (c) 2016-2017 Richard Henkenjohann
  *
  * @package NotificationCenterClockworkSMS
  * @author  Richard Henkenjohann <richardhenkenjohann@googlemail.com>
