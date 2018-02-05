@@ -1,12 +1,17 @@
 <?php
+
 /**
- * Clockwork SMS gateway for the notification_center extension for Contao Open Source CMS
+ * This file is part of richardhj/contao-notification_center_clockworksms.
  *
- * Copyright (c) 2016-2017 Richard Henkenjohann
+ * Copyright (c) 2016-2018 Richard Henkenjohann
  *
- * @package NotificationCenterClockworkSMS
- * @author  Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @package   richardhj/contao-notification_center_clockworksms
+ * @author    Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @copyright 2016-2018 Richard Henkenjohann
+ * @license   https://github.com/richardhj/contao-notification_center_clockworksms/blob/master/LICENSE LGPL-3.0
  */
+
+use Richardhj\NotificationCenterClockworkSmsBundle\Util\ClockworkSmsHelper;
 
 
 /** @noinspection PhpUndefinedMethodInspection */
@@ -16,7 +21,8 @@ $table = NotificationCenter\Model\Language::getTable();
 /**
  * Palettes
  */
-$GLOBALS['TL_DCA'][$table]['palettes']['clockworksms'] = '{general_legend},language,fallback;{meta_legend},sms_sender,sms_recipients,sms_recipients_region;{content_legend},sms_text';
+$GLOBALS['TL_DCA'][$table]['palettes']['clockworksms'] =
+    '{general_legend},language,fallback;{meta_legend},sms_sender,sms_recipients,sms_recipients_region;{content_legend},sms_text';
 
 
 /**
@@ -32,7 +38,7 @@ $GLOBALS['TL_DCA'][$table]['fields']['sms_sender'] = [
         'tl_class'       => 'w50',
     ],
     'save_callback' => [
-        ['NotificationCenter\Util\ClockworkSmsHelper', 'validateSmsSender'],
+        [ClockworkSmsHelper::class, 'validateSmsSender'],
     ],
     'sql'           => "varchar(255) NOT NULL default ''",
 ];
@@ -48,7 +54,7 @@ $GLOBALS['TL_DCA'][$table]['fields']['sms_recipients'] = [
         'mandatory'      => true,
     ],
     'save_callback' => [
-        ['NotificationCenter\Util\ClockworkSmsHelper', 'validatePhoneNumberList'],
+        [ClockworkSmsHelper::class, 'validatePhoneNumberList'],
     ],
     'sql'           => "varchar(255) NOT NULL default ''",
 ];
@@ -77,5 +83,5 @@ $GLOBALS['TL_DCA'][$table]['fields']['sms_text'] =
             'decodeEntities' => true,
             'mandatory'      => true,
         ],
-        'sql'       => "text NULL",
+        'sql'       => 'text NULL',
     ];

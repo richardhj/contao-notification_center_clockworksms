@@ -1,18 +1,23 @@
 <?php
+
 /**
- * Clockwork SMS gateway for the notification_center extension for Contao Open Source CMS
+ * This file is part of richardhj/contao-notification_center_clockworksms.
  *
- * Copyright (c) 2016-2017 Richard Henkenjohann
+ * Copyright (c) 2016-2018 Richard Henkenjohann
  *
- * @package NotificationCenterClockworkSMS
- * @author  Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @package   richardhj/contao-notification_center_clockworksms
+ * @author    Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @copyright 2016-2018 Richard Henkenjohann
+ * @license   https://github.com/richardhj/contao-notification_center_clockworksms/blob/master/LICENSE LGPL-3.0
  */
+
+use Richardhj\NotificationCenterClockworkSmsBundle\Gateway\ClockworkSms;
 
 
 /**
  * Notification Center Gateways
  */
-$GLOBALS['NOTIFICATION_CENTER']['GATEWAY']['clockworksms'] = 'NotificationCenter\Gateway\ClockworkSms';
+$GLOBALS['NOTIFICATION_CENTER']['GATEWAY']['clockworksms'] = ClockworkSms::class;
 
 
 /**

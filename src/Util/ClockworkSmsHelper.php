@@ -1,15 +1,20 @@
 <?php
+
 /**
- * Clockwork SMS gateway for the notification_center extension for Contao Open Source CMS
+ * This file is part of richardhj/contao-notification_center_clockworksms.
  *
- * Copyright (c) 2016-2017 Richard Henkenjohann
+ * Copyright (c) 2016-2018 Richard Henkenjohann
  *
- * @package NotificationCenterClockworkSMS
- * @author  Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @package   richardhj/contao-notification_center_clockworksms
+ * @author    Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @copyright 2016-2018 Richard Henkenjohann
+ * @license   https://github.com/richardhj/contao-notification_center_clockworksms/blob/master/LICENSE LGPL-3.0
  */
 
 
-namespace NotificationCenter\Util;
+namespace Richardhj\NotificationCenterClockworkSmsBundle\Util;
+
+use Contao\Validator;
 
 
 /**
@@ -25,8 +30,7 @@ class ClockworkSmsHelper
      * @param mixed $varValue
      *
      * @return mixed
-     * @throws \Exception
-     * @internal param \DataContainer $dc
+     * @throws \RuntimeException
      */
     public function validateSmsSender($varValue)
     {
@@ -35,10 +39,10 @@ class ClockworkSmsHelper
                 return $varValue;
             }
 
-            if ((!\Validator::isAlphanumeric($varValue) && !\Clockwork::is_valid_msisdn($varValue))
-                || (\Validator::isAlphanumeric($varValue) && strlen($varValue) > 11)
+            if ((!Validator::isAlphanumeric($varValue) && !\Clockwork::is_valid_msisdn($varValue))
+                || (Validator::isAlphanumeric($varValue) && \strlen($varValue) > 11)
             ) {
-                throw new \Exception($GLOBALS['TL_LANG']['ERR']['invalidClockworkSmsSender']);
+                throw new \RuntimeException($GLOBALS['TL_LANG']['ERR']['invalidClockworkSmsSender']);
             }
 
         }
@@ -53,7 +57,7 @@ class ClockworkSmsHelper
      * @param mixed $varValue
      *
      * @return mixed
-     * @throws \Exception
+     * @throws \RuntimeException
      * @internal param \DataContainer $dc
      */
     public function validatePhoneNumberList($varValue)
@@ -67,8 +71,8 @@ class ClockworkSmsHelper
                     continue;
                 }
 
-                if (!\Validator::isPhone($chunk)) {
-                    throw new \Exception($GLOBALS['TL_LANG']['ERR']['phone']);
+                if (!Validator::isPhone($chunk)) {
+                    throw new \RuntimeException($GLOBALS['TL_LANG']['ERR']['phone']);
                 }
             }
         }

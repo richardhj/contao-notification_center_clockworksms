@@ -1,18 +1,23 @@
 <?php
+
 /**
- * Clockwork SMS gateway for the notification_center extension for Contao Open Source CMS
+ * This file is part of richardhj/contao-notification_center_clockworksms.
  *
- * Copyright (c) 2016-2017 Richard Henkenjohann
+ * Copyright (c) 2016-2018 Richard Henkenjohann
  *
- * @package NotificationCenterClockworkSMS
- * @author  Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @package   richardhj/contao-notification_center_member_selectable
+ * @author    Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @copyright 2016-2018 Richard Henkenjohann
+ * @license   https://github.com/richardhj/contao-notification_center_member_selectable/blob/master/LICENSE LGPL-3.0
  */
 
-namespace NotificationCenter\MessageDraft;
+namespace Richardhj\NotificationCenterClockworkSmsBundle\MessageDraft;
 
+use Contao\Controller;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
+use NotificationCenter\MessageDraft\MessageDraftInterface;
 use NotificationCenter\Model\Language;
 use NotificationCenter\Model\Message;
 use NotificationCenter\Util\StringUtil;
@@ -20,6 +25,7 @@ use NotificationCenter\Util\StringUtil;
 
 /**
  * Class ClockworkSmsMessageDraft
+ *
  * @package NotificationCenter\MessageDraft
  */
 class ClockworkSmsMessageDraft implements MessageDraftInterface
@@ -27,39 +33,38 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
 
     /**
      * Message
+     *
      * @var Message|\Model
      */
     protected $objMessage;
 
-
     /**
      * Language
+     *
      * @var Language|\Model
      */
     protected $objLanguage;
 
-
     /**
      * Tokens
+     *
      * @var array
      */
     protected $arrTokens = [];
 
-
     /**
      * Construct the object
      *
-     * @param Message  $objMessage
-     * @param Language $objLanguage
-     * @param          $arrTokens
+     * @param Message  $message
+     * @param Language $language
+     * @param array    $tokens
      */
-    public function __construct(Message $objMessage, Language $objLanguage, $arrTokens)
+    public function __construct(Message $message, Language $language, array $tokens)
     {
-        $this->arrTokens = $arrTokens;
-        $this->objLanguage = $objLanguage;
-        $this->objMessage = $objMessage;
+        $this->arrTokens   = $tokens;
+        $this->objLanguage = $language;
+        $this->objMessage  = $message;
     }
-
 
     /**
      * @return string|null
@@ -72,7 +77,6 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
             StringUtil::NO_TAGS | StringUtil::NO_EMAILS | StringUtil::NO_BREAKS
         ) ?: null;
     }
-
 
     /**
      * @return array
@@ -87,8 +91,8 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
         );
         $arrRecipients = [];
 
-        foreach ((array)trimsplit(',', $strRecipients) as $strRecipient) {
-            if ($strRecipient != '') {
+        foreach (trimsplit(',', $strRecipients) as $strRecipient) {
+            if ('' !== $strRecipient) {
                 $strRecipient = StringUtil::recursiveReplaceTokensAndTags(
                     $strRecipient,
                     $this->arrTokens,
@@ -118,9 +122,9 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
         return $arrRecipients;
     }
 
-
     /**
      * Returns the message
+     *
      * @return string
      */
     public function getText()
@@ -128,9 +132,8 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
         $strText = $this->objLanguage->sms_text;
         $strText = StringUtil::recursiveReplaceTokensAndTags($strText, $this->arrTokens, StringUtil::NO_TAGS);
 
-        return \Controller::convertRelativeUrls($strText, '', true);
+        return Controller::convertRelativeUrls($strText, '', true);
     }
-
 
     /**
      * {@inheritdoc}
@@ -140,7 +143,6 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
         return $this->arrTokens;
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -148,7 +150,6 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
     {
         return $this->objMessage;
     }
-
 
     /**
      * {@inheritdoc}
@@ -158,37 +159,36 @@ class ClockworkSmsMessageDraft implements MessageDraftInterface
         return $this->objLanguage->language;
     }
 
-
     /**
      * Try to normalize a given phone number string
      *
-     * @param $strPhone
+     * @param $phone
      *
      * @return string|false in case of failing
      */
-    protected function normalizePhoneNumber($strPhone)
+    protected function normalizePhoneNumber($phone)
     {
-        $objPhoneNumberUtil = PhoneNumberUtil::getInstance();
+        $phoneNumberUtil = PhoneNumberUtil::getInstance();
 
         try {
             // We have to find a default country code as we can not make sure to get a internationalized phone number
             $strDefaultRegion =
-                (StringUtil::recursiveReplaceTokensAndTags(
+                StringUtil::recursiveReplaceTokensAndTags(
                     $this->objLanguage->sms_recipients_region,
                     $this->arrTokens,
                     StringUtil::NO_TAGS | StringUtil::NO_EMAILS | StringUtil::NO_BREAKS
-                ))
+                )
                     ?: $this->objLanguage->language;
 
-            $phoneNumber = $objPhoneNumberUtil->parse($strPhone, strtoupper($strDefaultRegion));
+            $phoneNumber = $phoneNumberUtil->parse($phone, strtoupper($strDefaultRegion));
 
-            return ltrim($objPhoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164), '+');
+            return ltrim($phoneNumberUtil->format($phoneNumber, PhoneNumberFormat::E164), '+');
 
         } catch (NumberParseException $e) {
             \System::log(
                 sprintf(
                     'Failed to normalize phone number "%s" with message "%s"',
-                    $strPhone,
+                    $phone,
                     $e->getMessage()
                 ),
                 __METHOD__,
