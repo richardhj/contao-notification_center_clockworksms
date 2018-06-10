@@ -35,7 +35,12 @@ class Plugin implements BundlePluginInterface
     {
         return [
             BundleConfig::create(RichardhjNotificationCenterClockworkSmsBundle::class)
-                ->setLoadAfter([ContaoCoreBundle::class])
+                ->setLoadAfter(
+                    [
+                        ContaoCoreBundle::class,
+                        'notification_center'
+                    ]
+                )
                 ->setReplace(['notification_center_clockworksms']),
         ];
     }

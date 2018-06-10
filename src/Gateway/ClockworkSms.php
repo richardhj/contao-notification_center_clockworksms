@@ -13,7 +13,9 @@
 
 namespace Richardhj\NotificationCenterClockworkSmsBundle\Gateway;
 
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\MemberModel;
+use Contao\System;
 use mediaburst\ClockworkSMS\Clockwork;
 use mediaburst\ClockworkSMS\ClockworkException;
 use NotificationCenter\Gateway\Base;
@@ -24,6 +26,8 @@ use NotificationCenter\MessageDraft\MessageDraftInterface;
 use NotificationCenter\Model\Gateway;
 use NotificationCenter\Model\Language;
 use NotificationCenter\Model\Message;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Richardhj\NotificationCenterClockworkSmsBundle\MessageDraft\ClockworkSmsMessageDraft;
 
 
@@ -43,6 +47,20 @@ class ClockworkSms extends Base
      */
     protected $objModel;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param Gateway $model
+     */
+    public function __construct(Gateway $model)
+    {
+        parent::__construct($model);
+
+        $this->logger = System::getContainer()->get('monolog.logger.contao');
+    }
 
     /**
      * Returns a MessageDraft
@@ -60,14 +78,14 @@ class ClockworkSms extends Base
         }
 
         if (null === ($objLanguage = Language::findByMessageAndLanguageOrFallback($message, $language))) {
-            \System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 sprintf(
                     'Could not find matching language or fallback for message ID "%s" and language "%s".',
                     $message->id,
                     $language
                 ),
-                __METHOD__,
-                TL_ERROR
+                array('contao' => new ContaoContext(__METHOD__, TL_ERROR))
             );
 
             return null;
@@ -85,16 +103,17 @@ class ClockworkSms extends Base
      * @param   string         $language
      *
      * @return  bool
+     *
+     * @throws ClockworkException If api key is not set
      */
     public function send(Message $message, array $tokens, $language = '')
     {
         if ('' === $this->objModel->clockwork_api_key) {
-            \System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 sprintf('Please provide the Clockwork API key for message ID "%s"', $message->id),
-                __METHOD__,
-                TL_ERROR
+                array('contao' => new ContaoContext(__METHOD__, TL_ERROR))
             );
-
             return false;
         }
 
@@ -109,10 +128,11 @@ class ClockworkSms extends Base
         $messages = [];
 
         $clockwork = new Clockwork(
-            $this->objModel->clockwork_api_key, [
+            $this->objModel->clockwork_api_key,
+            [
                 'from'     => $draft->getFrom(),
-                'long'     => (bool)$message->long,
-                'truncate' => (bool)$message->truncate,
+                'long'     => (bool) $message->long,
+                'truncate' => (bool) $message->truncate,
             ]
         );
 
@@ -127,15 +147,15 @@ class ClockworkSms extends Base
             $result = $clockwork->send($messages);
 
         } catch (ClockworkException $e) {
-            \System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 sprintf(
                     'Error with message "%s" (Code %s) while sending the Clockwork request for message ID "%s" occurred.',
                     $e->getMessage(),
                     $e->getCode(),
                     $message->id
                 ),
-                __METHOD__,
-                TL_ERROR
+                array('contao' => new ContaoContext(__METHOD__, TL_ERROR))
             );
 
             return false;
@@ -143,17 +163,17 @@ class ClockworkSms extends Base
 
         $blnError = false;
 
-        foreach ((array)$result as $msg) {
+        foreach ((array) $result as $msg) {
             if (!$msg['success']) {
-                \System::log(
+                $this->logger->log(
+                    LogLevel::ERROR,
                     sprintf(
                         'Error with message "%s" (Code %s) while sending the Clockwork request for message ID "%s" occurred.',
                         $msg['error_message'],
                         $msg['error_code'],
                         $message->id
                     ),
-                    __METHOD__,
-                    TL_ERROR
+                    array('contao' => new ContaoContext(__METHOD__, TL_ERROR))
                 );
 
                 $blnError = true;
@@ -165,7 +185,14 @@ class ClockworkSms extends Base
 
 
     /**
-     * {@inheritdoc}
+     * Check whether an exemplary draft can be send by means of a given message and gateway. In most cases this check
+     * looks for existing recipients
+     *
+     * @param Message $objMessage
+     *
+     * @return bool
+     *
+     * @throws \LogicException Optional with an error message
      */
     public function canSendDraft(Message $message)
     {
@@ -180,7 +207,7 @@ class ClockworkSms extends Base
             (
                 array_map(
                     function ($key) {
-                        return 'member_'.$key;
+                        return 'member_' . $key;
                     },
                     array_keys($memberModel->row())
                 ),

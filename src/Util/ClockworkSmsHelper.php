@@ -15,10 +15,12 @@
 namespace Richardhj\NotificationCenterClockworkSmsBundle\Util;
 
 use Contao\Validator;
+use mediaburst\ClockworkSMS\Clockwork;
 
 
 /**
  * Class ClockworkSmsHelper
+ *
  * @package NotificationCenter\Util
  */
 class ClockworkSmsHelper
@@ -30,6 +32,7 @@ class ClockworkSmsHelper
      * @param mixed $varValue
      *
      * @return mixed
+     *
      * @throws \RuntimeException
      */
     public function validateSmsSender($varValue)
@@ -39,7 +42,7 @@ class ClockworkSmsHelper
                 return $varValue;
             }
 
-            if ((!Validator::isAlphanumeric($varValue) && !\Clockwork::is_valid_msisdn($varValue))
+            if ((!Validator::isAlphanumeric($varValue) && !Clockwork::is_valid_msisdn($varValue))
                 || (Validator::isAlphanumeric($varValue) && \strlen($varValue) > 11)
             ) {
                 throw new \RuntimeException($GLOBALS['TL_LANG']['ERR']['invalidClockworkSmsSender']);
@@ -57,15 +60,15 @@ class ClockworkSmsHelper
      * @param mixed $varValue
      *
      * @return mixed
+     *
      * @throws \RuntimeException
+     *
      * @internal param \DataContainer $dc
      */
     public function validatePhoneNumberList($varValue)
     {
         if ('' !== $varValue) {
-            $chunks = trimsplit(',', $varValue);
-
-            foreach ($chunks as $chunk) {
+            foreach (trimsplit(',', $varValue) as $chunk) {
                 // Skip string with tokens or inserttags
                 if (false !== strpos($chunk, '##') || false !== strpos($chunk, '{{')) {
                     continue;
